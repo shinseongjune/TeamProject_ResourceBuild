@@ -8,6 +8,8 @@ using UnityEngine.UIElements;
 public class EnemyAi : MonoBehaviour
 {
     MobPackSystem _mobPackSystem;
+    Node _behaviorTree;
+    EnemyStat _stat;
 
     public float attackRange;
     public float attackRangeNear;
@@ -17,18 +19,47 @@ public class EnemyAi : MonoBehaviour
     public float viewingAngle;
     public int segments;
 
+    public bool isattacker;
 
     private void Start()
     {
         _mobPackSystem = GetComponentInParent<MobPackSystem>();
+        _behaviorTree = InitializeBehaviorTree();
+        _stat = GetComponent<EnemyStat>();
     }
+    private Node InitializeBehaviorTree()
+    {
+        return new Selector(new List<Node> {
+            new Sequence(new List<Node> { // 사망 시퀀스
+                new Condition(() => _stat.hp <= 0),
+                new ActionNode(() => FieldOfViewDetection()),
+            }),
+            new Sequence(new List<Node> {// 공격자 셀렉터
+                new Condition(() => _mobPackSystem.iscombatState),
+                new Sequence(new List<Node> { 
+                    new Condition(() => isattacker),
+                    new ActionNode(() => AttackerAction()),
+                }),
 
+                //화장실 갔다올게유
+
+                new Sequence(new List<Node> {
+                    new Condition(() => !isattacker),
+                    new ActionNode(() => CombatWait()),
+                }),
+            }),
+            new Sequence(new List<Node> { // 감지 시퀀스
+                new Condition(() => FieldOfViewDetection()),
+                new ActionNode(() => FieldOfViewDetection()),
+            }),
+        });
+    }
     private void Update()
     {
-        FieldOfViewDetection();
+        _behaviorTree.Tick();
     }
 
-    void FieldOfViewDetection()
+    bool FieldOfViewDetection()
     {
         Collider[] playersInViewRadius = Physics.OverlapSphere(viewingOriginPos.position, viewingDistance, _mobPackSystem.playerLayer);
 
@@ -41,11 +72,19 @@ public class EnemyAi : MonoBehaviour
             {
                 // 플레이어가 시야각 내에 있는 경우
                 Debug.DrawLine(viewingOriginPos.position, player.transform.position, Color.white);
-                // 여기서 플레이어를 감지한 후의 행동을 추가합니다.
+                return true;
             }
         }
-    }
+        return false;
+    }// 시선 감지
 
+    void AttackerAction()
+    { 
+
+    }
+    void CombatWait()
+    { 
+    }
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green; // 최대 공격 범위의 색상
@@ -54,10 +93,13 @@ public class EnemyAi : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, attackRangeNear);
 
         Gizmos.color = Color.white;
-        DrawArc(viewingOriginPos.position,
-            viewingOriginPos.position + Quaternion.Euler(0, viewingAngle / 2, 0) * viewingOriginPos.forward * viewingDistance,
-            viewingOriginPos.position + Quaternion.Euler(0, -viewingAngle / 2, 0) * viewingOriginPos.forward * viewingDistance, 
-            viewingDistance);
+        if (FieldOfViewDetection())
+        {
+            DrawArc(viewingOriginPos.position,
+                viewingOriginPos.position + Quaternion.Euler(0, viewingAngle / 2, 0) * viewingOriginPos.forward * viewingDistance,
+                viewingOriginPos.position + Quaternion.Euler(0, -viewingAngle / 2, 0) * viewingOriginPos.forward * viewingDistance,
+                viewingDistance);
+        }
 
     }
     void DrawArc(Vector3 center, Vector3 start, Vector3 end, float radius)
