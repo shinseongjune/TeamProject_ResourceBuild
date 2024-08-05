@@ -4,12 +4,17 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
+using UnityEngine.AI;
 
 public class EnemyAi : MonoBehaviour
 {
     MobPackSystem _mobPackSystem;
     Node _behaviorTree;
     EnemyStat _stat;
+    NavMeshAgent agent;
+    RagdollSetup ragdoll;
+
+    Transform originPos;
 
     public float attackRange;
     public float attackRangeNear;
@@ -26,23 +31,21 @@ public class EnemyAi : MonoBehaviour
         _mobPackSystem = GetComponentInParent<MobPackSystem>();
         _behaviorTree = InitializeBehaviorTree();
         _stat = GetComponent<EnemyStat>();
+        originPos = transform;
     }
     private Node InitializeBehaviorTree()
     {
         return new Selector(new List<Node> {
             new Sequence(new List<Node> { // 사망 시퀀스
                 new Condition(() => _stat.hp <= 0),
-                new ActionNode(() => FieldOfViewDetection()),
+                new ActionNode(() => Death()),
             }),
-            new Sequence(new List<Node> {// 공격자 셀렉터
+            new Sequence(new List<Node> {// 공격자?
                 new Condition(() => _mobPackSystem.iscombatState),
                 new Sequence(new List<Node> { 
                     new Condition(() => isattacker),
                     new ActionNode(() => AttackerAction()),
                 }),
-
-                //화장실 갔다올게유
-
                 new Sequence(new List<Node> {
                     new Condition(() => !isattacker),
                     new ActionNode(() => CombatWait()),
@@ -59,6 +62,11 @@ public class EnemyAi : MonoBehaviour
         _behaviorTree.Tick();
     }
 
+    void Death()
+    { 
+        
+    }
+
     bool FieldOfViewDetection()
     {
         Collider[] playersInViewRadius = Physics.OverlapSphere(viewingOriginPos.position, viewingDistance, _mobPackSystem.playerLayer);
@@ -72,17 +80,21 @@ public class EnemyAi : MonoBehaviour
             {
                 // 플레이어가 시야각 내에 있는 경우
                 Debug.DrawLine(viewingOriginPos.position, player.transform.position, Color.white);
+                
                 return true;
             }
         }
         return false;
-    }// 시선 감지
+    }
 
     void AttackerAction()
     { 
 
     }
     void CombatWait()
+    { 
+    }
+    void Patrol()
     { 
     }
     private void OnDrawGizmos()
@@ -93,13 +105,10 @@ public class EnemyAi : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, attackRangeNear);
 
         Gizmos.color = Color.white;
-        if (FieldOfViewDetection())
-        {
             DrawArc(viewingOriginPos.position,
                 viewingOriginPos.position + Quaternion.Euler(0, viewingAngle / 2, 0) * viewingOriginPos.forward * viewingDistance,
                 viewingOriginPos.position + Quaternion.Euler(0, -viewingAngle / 2, 0) * viewingOriginPos.forward * viewingDistance,
                 viewingDistance);
-        }
 
     }
     void DrawArc(Vector3 center, Vector3 start, Vector3 end, float radius)

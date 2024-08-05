@@ -4,8 +4,13 @@ using UnityEngine;
 
 public abstract class AttackInteractable : MonoBehaviour
 {
+    public float Maxhp;
     public float hp;
 
+    private void Start()
+    {
+        Maxhp = hp;
+    }
 
     public abstract void Attack();
 

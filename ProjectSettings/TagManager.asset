@@ -8,12 +8,12 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - PostProcessingVolumes
   - Water
   - UI
   - Player
   - Enemy
-  - 
+  - Ragdoll
   - 
   - 
   - 
