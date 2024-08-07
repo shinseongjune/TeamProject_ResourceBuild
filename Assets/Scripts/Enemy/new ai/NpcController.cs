@@ -4,11 +4,71 @@ using UnityEngine;
 
 public class NpcController : MonoBehaviour
 {
-    
-    //root status 를 참조해서 적의 유형 체력 데미지 설정
+
+    public RootState rootState;
     private void Start()
     {
         
     }
-    
+    bool FieldOfViewDetection()
+    {
+        Collider[] playersInViewRadius = Physics.OverlapSphere(rootState.viewingOriginPos.position, rootState.viewingDistance, rootState.playerlayer);
+
+        foreach (Collider player in playersInViewRadius)
+        {
+            Vector3 directionToPlayer = (player.transform.position - rootState.viewingOriginPos.position).normalized;
+            float angleToPlayer = Vector3.Angle(rootState.viewingOriginPos.forward, directionToPlayer); // transform.forward를 사용하여 방향 벡터를 확인합니다.
+
+            if (angleToPlayer < rootState.viewingAngle / 2)  // 각도가 반각도보다 작으면 감지
+            {
+                // 플레이어가 시야각 내에 있는 경우
+                Debug.DrawLine(rootState.viewingOriginPos.position, player.transform.position, Color.white);
+
+                return true;
+            }
+        }
+        return false;
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green; // 최대 공격 범위의 색상
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+        Gizmos.color = Color.cyan; // 최소 공격 범위의 색상
+        Gizmos.DrawWireSphere(transform.position, attackRangeNear);
+
+        Gizmos.color = Color.white;
+        DrawArc(rootState.viewingOriginPos.position,
+            rootState.viewingOriginPos.position + Quaternion.Euler(0, rootState.viewingAngle / 2, 0) * rootState.viewingOriginPos.forward * rootState.viewingDistance,
+            rootState.viewingOriginPos.position + Quaternion.Euler(0, -rootState.viewingAngle / 2, 0) * rootState.viewingOriginPos.forward * rootState.viewingDistance,
+            rootState.viewingDistance);
+
+    }
+    void DrawArc(Vector3 center, Vector3 start, Vector3 end, float radius)
+    {
+        Gizmos.DrawLine(center, start);
+        Gizmos.DrawLine(center, end);
+        // 원호를 그리기 위한 각도 계산
+        Vector3 startToCenter = (start - center).normalized;
+        Vector3 endToCenter = (end - center).normalized;
+
+        float startAngle = Mathf.Atan2(startToCenter.z, startToCenter.x) * Mathf.Rad2Deg;
+        float endAngle = Mathf.Atan2(endToCenter.z, endToCenter.x) * Mathf.Rad2Deg;
+
+        if (endAngle < startAngle)
+        {
+            endAngle += 360;
+        }
+
+        // 원호를 그리기 위해 각도 범위에 따라 점 계산
+        int segments = Mathf.Max(2, this.rootState.segments);
+        Vector3 previousPoint = center + radius * new Vector3(Mathf.Cos(startAngle * Mathf.Deg2Rad), 0, Mathf.Sin(startAngle * Mathf.Deg2Rad));
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = Mathf.Lerp(startAngle, endAngle, i / (float)segments);
+            Vector3 point = center + radius * new Vector3(Mathf.Cos(angle * Mathf.Deg2Rad), 0, Mathf.Sin(angle * Mathf.Deg2Rad));
+            Gizmos.DrawLine(previousPoint, point);
+            previousPoint = point;
+        }
+    }
 }
