@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class NpcController : MonoBehaviour
 {
+    [HideInInspector] public AttackInteractable _stat;
+    [HideInInspector] public NavMeshAgent _agent;
     public RootState rootState;
     public Transform viewingOriginPos;
     public List<NPCSkill> skills;
@@ -20,6 +23,10 @@ public class NpcController : MonoBehaviour
         nodeTree.Tick();
     }
 
+    public void SetPos(Vector3 pos)
+    {
+        _agent.SetDestination(pos);
+    }
     bool FieldOfViewDetection()
     {
         Collider[] playersInViewRadius = Physics.OverlapSphere(viewingOriginPos.position, rootState.viewingDistance, rootState.playerlayer);
