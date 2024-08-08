@@ -18,8 +18,14 @@ public class RootState : ScriptableObject
     public float maxHp;
     public float attackPower;
     [Header("fov")]
-    public Transform viewingOriginPos;
+    [Tooltip("시야 거리")]
     public float viewingDistance;
+    [Tooltip("시야 각도")]
     public float viewingAngle;
+    [Tooltip("곡률")]
     public int segments;
+    [Tooltip("공격 범위")]
+    public float attackRange;
+    [Tooltip("최소 공격 범위")]
+    public float attackRangeNear;
 }

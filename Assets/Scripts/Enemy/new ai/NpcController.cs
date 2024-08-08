@@ -4,25 +4,35 @@ using UnityEngine;
 
 public class NpcController : MonoBehaviour
 {
-
     public RootState rootState;
+    public Transform viewingOriginPos;
+    public List<NPCSkill> skills;
+
+    private Node nodeTree;
+
     private void Start()
     {
         
     }
+    
+    private void Update()
+    {
+        nodeTree.Tick();
+    }
+
     bool FieldOfViewDetection()
     {
-        Collider[] playersInViewRadius = Physics.OverlapSphere(rootState.viewingOriginPos.position, rootState.viewingDistance, rootState.playerlayer);
+        Collider[] playersInViewRadius = Physics.OverlapSphere(viewingOriginPos.position, rootState.viewingDistance, rootState.playerlayer);
 
         foreach (Collider player in playersInViewRadius)
         {
-            Vector3 directionToPlayer = (player.transform.position - rootState.viewingOriginPos.position).normalized;
-            float angleToPlayer = Vector3.Angle(rootState.viewingOriginPos.forward, directionToPlayer); // transform.forward를 사용하여 방향 벡터를 확인합니다.
+            Vector3 directionToPlayer = (player.transform.position - viewingOriginPos.position).normalized;
+            float angleToPlayer = Vector3.Angle(viewingOriginPos.forward, directionToPlayer); // transform.forward를 사용하여 방향 벡터를 확인합니다.
 
             if (angleToPlayer < rootState.viewingAngle / 2)  // 각도가 반각도보다 작으면 감지
             {
                 // 플레이어가 시야각 내에 있는 경우
-                Debug.DrawLine(rootState.viewingOriginPos.position, player.transform.position, Color.white);
+                Debug.DrawLine(viewingOriginPos.position, player.transform.position, Color.white);
 
                 return true;
             }
@@ -32,14 +42,14 @@ public class NpcController : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green; // 최대 공격 범위의 색상
-        Gizmos.DrawWireSphere(transform.position, attackRange);
+        Gizmos.DrawWireSphere(transform.position, rootState.attackRange);
         Gizmos.color = Color.cyan; // 최소 공격 범위의 색상
-        Gizmos.DrawWireSphere(transform.position, attackRangeNear);
+        Gizmos.DrawWireSphere(transform.position, rootState.attackRangeNear);
 
         Gizmos.color = Color.white;
-        DrawArc(rootState.viewingOriginPos.position,
-            rootState.viewingOriginPos.position + Quaternion.Euler(0, rootState.viewingAngle / 2, 0) * rootState.viewingOriginPos.forward * rootState.viewingDistance,
-            rootState.viewingOriginPos.position + Quaternion.Euler(0, -rootState.viewingAngle / 2, 0) * rootState.viewingOriginPos.forward * rootState.viewingDistance,
+        DrawArc(viewingOriginPos.position,
+            viewingOriginPos.position + Quaternion.Euler(0, rootState.viewingAngle / 2, 0) * viewingOriginPos.forward * rootState.viewingDistance,
+            viewingOriginPos.position + Quaternion.Euler(0, -rootState.viewingAngle / 2, 0) * viewingOriginPos.forward * rootState.viewingDistance,
             rootState.viewingDistance);
 
     }

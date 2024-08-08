@@ -9,17 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a6136ea16cbe9b4b96afc91914702dd, type: 3}
-  m_Name: rootstate
+  m_Script: {fileID: 11500000, guid: 6ba04f5ae6c280040bba89b539531f67, type: 3}
+  m_Name: NPCSkill
   m_EditorClassIdentifier: 
-  eNPC: 0
-  playerlayer:
-    serializedVersion: 2
-    m_Bits: 64
-  maxHp: 100
-  attackPower: 0
-  viewingDistance: 65.6
-  viewingAngle: 54.6
-  segments: 5
-  attackRange: 3
-  attackRangeNear: 2
+  priority: 0
