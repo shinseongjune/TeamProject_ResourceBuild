@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3382d9c9bdbda3f4a855673f70b820a4, type: 3}
   m_Name: RandamMoveAction
   m_EditorClassIdentifier: 
-  radius: 75
-  color: {r: 1, g: 0, b: 0, a: 0}
+  MoveType: 0
+  randamMoveRange: 5

@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using static TreeEditor.TreeEditorHelper;
 
 public class NpcController : MonoBehaviour
 {
-    [HideInInspector] public AttackInteractable _stat;
+    [HideInInspector] public EnemyStat _stat;
     [HideInInspector] public NavMeshAgent _agent;
     [HideInInspector] public RagdollSetup ragdoll;
     public MosterSpawner Spawner;
@@ -20,6 +19,9 @@ public class NpcController : MonoBehaviour
     private void Start()
     {
         nodeTree = BehaviourTree.InitializeBehaviorTree(this);
+        _agent = GetComponent<NavMeshAgent>();
+        ragdoll = GetComponent<RagdollSetup>();
+        _stat = GetComponent<EnemyStat>();
     }
     
     private void Update()

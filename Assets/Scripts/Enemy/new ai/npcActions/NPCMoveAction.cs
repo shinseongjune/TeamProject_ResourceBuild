@@ -24,7 +24,7 @@ public class NPCMoveAction : NPCAction
             case movetype.randamMove:
                 if (controller._agent.remainingDistance < 0.5f)
                 {
-                    controller.SetPos(controller.transform.position + new Vector3(Random.Range(randamMoveRange, -randamMoveRange), 0, Random.Range(randamMoveRange, -randamMoveRange)));
+                    controller._agent.SetDestination(controller.transform.position + new Vector3(Random.Range(-randamMoveRange, randamMoveRange), 0, Random.Range(-randamMoveRange, randamMoveRange)));
                 }
                 break;
             case movetype.chasingMove:
