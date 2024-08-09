@@ -9,38 +9,24 @@ public class RagdollSetup : MonoBehaviour
     public Rigidbody[] ragdollRigidbody;
     public Rigidbody hip;
     public PhysicMaterial ragdollMaterial;
-
-    public bool testActivateRagdoll;
-    public Vector3 testvelocity;
-    public bool testDisableRagdoll;
-
     private void Start()
     {
         ragdollRigidbody = GetComponentsInChildren<Rigidbody>();
-        an = GetComponent<Animator>(); 
+        an = GetComponent<Animator>();
+        DisableRagdoll();
     }
-    private void Update()
-    {
-        if (testActivateRagdoll)
-        {
-            ActivateRagdoll();
-        }
-        if (testDisableRagdoll)
-        {
-            DisableRagdoll();
-        }
-    }
-    public void ActivateRagdoll()
+      public void ActivateRagdoll(Collider ragdollCollider)
     {
         an.enabled = false;
-        hip.velocity = testvelocity;
         foreach (var rigidbody in ragdollRigidbody)
         {
             rigidbody.isKinematic = false;
             rigidbody.gameObject.GetComponent<Collider>().material= ragdollMaterial;
         }
-        testActivateRagdoll = false;
-        hip.velocity = testvelocity;
+        if (ragdollCollider != null)
+        {
+            ragdollCollider.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        }
     }
 
     public void DisableRagdoll()
@@ -50,6 +36,5 @@ public class RagdollSetup : MonoBehaviour
         {
             rigidbody.isKinematic = true;
         }
-        testDisableRagdoll = false;
     }
 }

@@ -2,30 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "rootstate")]
+[CreateAssetMenu(fileName = "RootState", menuName = "NPC/RootState")]
 public class RootState : ScriptableObject
 {
-    public enum npcType
-    {
-        citizen,
-        normalMonster,
-        bossMonster
-    }
-    public npcType eNPC;
+ 
     public LayerMask playerlayer;
 
     [Header("hp")]
     public float maxHp;
     public float attackPower;
-    [Header("fov")]
-    [Tooltip("시야 거리")]
+    [Header("시야 거리")]
     public float viewingDistance;
-    [Tooltip("시야 각도")]
+    [Header("시야 각도")]
     public float viewingAngle;
-    [Tooltip("곡률")]
+    [Header("곡률 (디버깅용, 많으면 안좋음)")]
     public int segments;
-    [Tooltip("공격 범위")]
+    [Header("공격 범위 (최소 공격 범위보다 커야함)")]
     public float attackRange;
-    [Tooltip("최소 공격 범위")]
+    [Header("최소 공격 범위 (공격 범위보다 작아야 됨)")]
     public float attackRangeNear;
 }

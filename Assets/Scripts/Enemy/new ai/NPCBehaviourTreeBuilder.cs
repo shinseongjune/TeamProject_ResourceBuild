@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CreateAssetMenu(fileName = "NPCBehaviourTreeBuilder")]
+[CreateAssetMenu(fileName = "NPCBehaviourTreeBuilder", menuName = "NPC/NPCBehaviourTreeBuilder")]
 public class NPCBehaviourTreeBuilder : ScriptableObject
 {
     public enum npctype
     {
         Citizen,
-        NormalMonster,    // 오타 수정
-        EliteMonster,
-        MiddleBoss,
-        BossMonster       // 오타 수정
+        NormalMonster,   
+        BossMonster      
     }
 
     [Header("NPC 종류 : 시민, 일반 몬스터, 보스 몬스터")]
@@ -39,26 +37,27 @@ public class NPCBehaviourTreeBuilder : ScriptableObject
             case npctype.NormalMonster:
                 return new Selector(new List<Node> {
                     new Sequence(new List<Node> {
-                        new Condition(() => controller._stat.hp <= 0),
+                        new Condition(() => !controller.Spawner.PlayerDetection()),
                         new ActionNode(() => DeathAction.Action(controller)),
                     }),
-                    new ActionNode(() => WalkingAction.Action(controller))
-                });
-            case npctype.EliteMonster:
-                return new Selector(new List<Node> {
                     new Sequence(new List<Node> {
                         new Condition(() => controller._stat.hp <= 0),
                         new ActionNode(() => DeathAction.Action(controller)),
                     }),
-                    new ActionNode(() => WalkingAction.Action(controller))
-                });
-            case npctype.MiddleBoss:
-                return new Selector(new List<Node> {
+                    new Sequence(new List<Node> {
+                        new Condition(() => controller.FieldOfViewDetection()),
+                        new Selector(new List<Node> {
+                            new Condition(() => strikeFirst),
+                            new ActionNode(() => DeathAction.Action(controller)),
+                            new Condition(() => !strikeFirst),
+                            new ActionNode(() => DeathAction.Action(controller))
+                        })
+                    }),
                     new Sequence(new List<Node> {
                         new Condition(() => controller._stat.hp <= 0),
                         new ActionNode(() => DeathAction.Action(controller)),
                     }),
-                    new ActionNode(() => WalkingAction.Action(controller))
+
                 });
             case npctype.BossMonster:
                 return new Selector(new List<Node> {
@@ -66,25 +65,28 @@ public class NPCBehaviourTreeBuilder : ScriptableObject
                         new Condition(() => controller._stat.hp <= 0),
                         new ActionNode(() => DeathAction.Action(controller)),
                     }),
-                    new ActionNode(() => WalkingAction.Action(controller))
+                    new Sequence(new List<Node> {
+                        new Condition(() => controller.FieldOfViewDetection()),
+                        new ActionNode(() => DeathAction.Action(controller))
+                    }),
+                    new Sequence(new List<Node> {
+                        new Condition(() => controller._stat.hp <= 0),
+                        new ActionNode(() => DeathAction.Action(controller)),
+                    }),
                 });
             default:
-                return null;  // 모든 경우에 대해 반환값이 없는 문제를 방지하기 위해 추가
+                return null;  
         }
     }
 
     // Citizen
-    public int Citizen;
     public NPCAction DeathAction;
     public NPCAction WalkingAction;
     public NPCAction RunawayAction;
     // NormalMonster
     public int NormalMonster;    
+    public bool strikeFirst;
     // EliteMonster
-    public int EliteMonster;
-    // MiddleBoss
-    public int MiddleBoss;
-    // BossMonster
     public int BossMonster;     
 }
 
@@ -106,19 +108,13 @@ public class NPCBehaviourTreeBuilderEditor : Editor
                 EditorGUILayout.Space(10);
                 EditorGUILayout.LabelField("일반 시민의 행동 정의하기");
                 EditorGUILayout.Space(10);
-                exampleScript.Citizen = EditorGUILayout.IntField("Citizen Value", exampleScript.Citizen);
                 exampleScript.DeathAction = (NPCAction)EditorGUILayout.ObjectField("Death Action", exampleScript.DeathAction, typeof(NPCAction), false);
                 exampleScript.RunawayAction = (NPCAction)EditorGUILayout.ObjectField("Runaway Action", exampleScript.RunawayAction, typeof(NPCAction), false);
                 exampleScript.WalkingAction = (NPCAction)EditorGUILayout.ObjectField("Walking Action", exampleScript.WalkingAction, typeof(NPCAction), false);
                 break;
             case NPCBehaviourTreeBuilder.npctype.NormalMonster:
                 exampleScript.NormalMonster = EditorGUILayout.IntField("Normal Monster Value", exampleScript.NormalMonster);
-                break;
-            case NPCBehaviourTreeBuilder.npctype.EliteMonster:
-                exampleScript.EliteMonster = EditorGUILayout.IntField("Elite Monster Value", exampleScript.EliteMonster);
-                break;
-            case NPCBehaviourTreeBuilder.npctype.MiddleBoss:
-                exampleScript.MiddleBoss = EditorGUILayout.IntField("Middle Boss Value", exampleScript.MiddleBoss);
+                exampleScript.strikeFirst = EditorGUILayout.Toggle("Strike First", exampleScript.strikeFirst);
                 break;
             case NPCBehaviourTreeBuilder.npctype.BossMonster:
                 exampleScript.BossMonster = EditorGUILayout.IntField("Boss Monster Value", exampleScript.BossMonster);

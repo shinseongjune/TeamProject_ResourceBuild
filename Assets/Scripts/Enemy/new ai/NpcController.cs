@@ -2,20 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using static TreeEditor.TreeEditorHelper;
 
 public class NpcController : MonoBehaviour
 {
     [HideInInspector] public AttackInteractable _stat;
     [HideInInspector] public NavMeshAgent _agent;
+    [HideInInspector] public RagdollSetup ragdoll;
+    public MosterSpawner Spawner;
     public RootState rootState;
     public Transform viewingOriginPos;
     public List<NPCSkill> skills;
+    public NPCBehaviourTreeBuilder BehaviourTree;
 
     private Node nodeTree;
 
     private void Start()
     {
-        
+        nodeTree = BehaviourTree.InitializeBehaviorTree(this);
     }
     
     private void Update()
@@ -23,11 +27,16 @@ public class NpcController : MonoBehaviour
         nodeTree.Tick();
     }
 
+    void OnEnable()
+    { 
+
+    }
+    
     public void SetPos(Vector3 pos)
     {
         _agent.SetDestination(pos);
     }
-    bool FieldOfViewDetection()
+    public bool FieldOfViewDetection()
     {
         Collider[] playersInViewRadius = Physics.OverlapSphere(viewingOriginPos.position, rootState.viewingDistance, rootState.playerlayer);
 

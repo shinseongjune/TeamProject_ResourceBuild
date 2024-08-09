@@ -14,10 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NPCType: 0
   Citizen: 0
-  DeathAction: {fileID: 0}
-  WalkingAction: {fileID: 0}
-  RunawayAction: {fileID: 0}
+  DeathAction: {fileID: 11400000, guid: 8280296e3900a4548add4ae2ed08169c, type: 2}
+  WalkingAction: {fileID: 11400000, guid: 2e809c4dfdaae1c45a487e85f365854f, type: 2}
+  RunawayAction: {fileID: 11400000, guid: 4ad9f3d0b494fa04695dd7769b69bb65, type: 2}
   NormalMonster: 0
-  EliteMonster: 0
-  MiddleBoss: 0
+  strikeFirst: 0
   BossMonster: 0
